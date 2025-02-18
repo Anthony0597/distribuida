@@ -8,11 +8,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.List;
 
 @Path("/books")
+@Tag(name = "Libros", description = "Operaciones relacionadas con libros")
 @Produces("application/json")
 @Consumes("application/json")
 @ApplicationScoped
@@ -27,6 +31,7 @@ public class BookRest {
     AuthorRestClient authorRest;
 
     @GET
+    @Operation(summary = "Lista todos los libros", description = "Retorna un listado de todos los libros registrados")
     public List<BookDto> findAll(){
         // version 1
 //        return repository.findAll()
@@ -78,10 +83,16 @@ public class BookRest {
     }
 
     @GET
+    @Operation(summary = "Libro por id", description = "Retorna, si existe, el libro que tenga el id proporcionado")
     @Path("/{id}")
-    public Response findById(@PathParam("id") Integer id){
+    public Response findById(
+            @PathParam("id")
+            @Parameter(description = "El ID del libro que solo puede ser numeros enteros mayores a cero", required = true, example = "1")
+            Integer id){
         var obj = repository.findByIdOptional(id);
-
+        if(obj.isEmpty()){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         var auth= authorRest.findById(id);
 
         var bookDto = new BookDto();
@@ -92,13 +103,12 @@ public class BookRest {
         bookDto.setPrice(obj.get().getPrice());
         bookDto.setAuthorName(auth.getFirstName()+ " " + auth.getLastName());
 
-        if(obj.isEmpty()){
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+
         return Response.ok(bookDto).build();
     }
 
     @POST
+    @Operation(summary = "Registra un libro", description = "Guarda la informacion de una nuevo libro que se proporcione")
     public Response create(Book book){
         repository.persist(book);
         return Response.status(Response.Status.CREATED).build();
@@ -106,7 +116,11 @@ public class BookRest {
 
     @PUT
     @Path("/{id}")
-    public Response update(@PathParam("id") Integer id, Book book){
+    @Operation(summary = "Actualiza un libro", description = "Actualiza, si existe, los datos del libro con el id proporcionado")
+    public Response update(
+            @PathParam("id")
+            @Parameter(description = "El ID del libro que solo puede ser numeros enteros mayores a cero", required = true, example = "1")
+            Integer id, Book book){
         var obj = repository.update(id, book);
 
         if(obj.isEmpty()){
@@ -117,8 +131,12 @@ public class BookRest {
     }
 
     @DELETE
+    @Operation(summary = "Borrar un libro", description = "Elima del registro el libro que cuyo id coincida con el proporcionado")
     @Path("/{id}")
-    public Response delete(@PathParam("id") Integer id){
+    public Response delete(
+            @PathParam("id")
+            @Parameter(description = "El ID del libro que solo puede ser numeros enteros mayores a cero", required = true, example = "1")
+            Integer id){
         var obj = repository.deleteById(id);
         if(!obj){
             return Response.status(Response.Status.NOT_FOUND).build();

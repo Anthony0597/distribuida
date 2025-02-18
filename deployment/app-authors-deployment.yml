@@ -18,7 +18,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: app-authors
-          image: docker.io/jaimesalvador/app-authors:latest
+          image: docker.io/anthony0597/app-authors:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

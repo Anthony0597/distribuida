@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app-books
-          image: docker.io/jaimesalvador/app-books:latest
+          image: docker.io/anthony0597/app-books:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

@@ -50,8 +50,10 @@ dependencies {
     //Tracing
     implementation("io.quarkus:quarkus-opentelemetry")
 
-    //Tracing
+    //Fault tolerance
     implementation("io.quarkus:quarkus-smallrye-fault-tolerance")
+
+    implementation("io.quarkus:quarkus-smallrye-openapi")
 
 }
 

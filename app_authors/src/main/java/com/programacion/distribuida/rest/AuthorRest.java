@@ -8,6 +8,9 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -16,10 +19,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Path("/authors")
+@Tag(name = "Autores", description = "Operaciones relacionadas con autores")
 @Produces("application/json")
 @Consumes("application/json")
 @ApplicationScoped
-@Transactional
+//@Transactional
 public class AuthorRest {
 
     @Inject
@@ -34,8 +38,12 @@ public class AuthorRest {
 
 
     @GET
+    @Operation(summary = "autor por id", description = "Retorna, si existe, el autor que tenga el id proporcionado")
     @Path("/{id}")
-    public Response findById(@PathParam("id") Integer id) throws UnknownHostException {
+    public Response findById(
+            @PathParam("id")
+            @Parameter(description = "El ID del autor que solo puede ser numeros enteros mayores a cero", required = true, example = "1")
+            Integer id) throws UnknownHostException {
 
         int value = counter.getAndIncrement();
 
@@ -61,20 +69,26 @@ public class AuthorRest {
     }
 
     @GET
+    @Operation(summary = "Lista todos los autores", description = "Retorna un listado de todos los autores registrados")
     public List<Author> findAll(){
         return repository.findAll()
                 .list();
     }
 
     @POST
+    @Operation(summary = "Registra un autor", description = "Guarda la informacion de una nuevo autor que se proporcione")
     public Response create(Author author){
         repository.persist(author);
         return Response.status(Response.Status.CREATED).build();
     }
 
     @PUT
+    @Operation(summary = "Actualiza un autor", description = "Actualiza, si existe, los datos del autor con el id proporcionado")
     @Path("/{id}")
-    public Response update(@PathParam("id") Integer id, Author author){
+    public Response update(
+            @PathParam("id")
+            @Parameter(description = "El ID del autor que solo puede ser numeros enteros mayores a cero", required = true, example = "1")
+            Integer id, Author author){
         var obj = repository.update(id, author);
 
         if(obj.isEmpty()){
@@ -85,8 +99,12 @@ public class AuthorRest {
     }
 
     @DELETE
+        @Operation(summary = "Borrar un autor", description = "Elima del registro el autor que cuyo id coincida con el proporcionado")
     @Path("/{id}")
-    public Response delete(@PathParam("id") Integer id){
+    public Response delete(
+            @PathParam("id")
+            @Parameter(description = "El ID del autor que solo puede ser numeros enteros mayores a cero", required = true, example = "1")
+            Integer id){
         var obj = repository.deleteById(id);
         if(!obj){
             return Response.status(Response.Status.NOT_FOUND).build();

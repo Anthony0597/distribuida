@@ -46,8 +46,10 @@ dependencies {
     //implementation("io.quarkus:quarkus-opentelemetry")
 
     //Control de versiones DB
-    implementation("io.quarkus:quarkus-flyway")
-    implementation("org.flywaydb:flyway-core:11.3.2")
+    //implementation("io.quarkus:quarkus-flyway")
+    //implementation("org.flywaydb:flyway-core:11.3.2")
+
+    implementation("io.quarkus:quarkus-smallrye-openapi")
 
 }
 
